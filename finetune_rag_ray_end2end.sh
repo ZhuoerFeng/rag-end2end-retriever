@@ -1,12 +1,12 @@
 # Sample script to finetune RAG using Ray for distributed retrieval.
 
 # Add parent directory to python path to access lightning_base.py
-export PYTHONPATH="../":"${PYTHONPATH}"
+# export PYTHONPATH="../":"${PYTHONPATH}"
 
 #creates the custom knowlegebase
-python use_own_knowledge_dataset.py  \
-    --csv_path /DIR/SQUAD-KB/squad-kb.csv \
-    --output_dir  /DIR/SQUAD-KB
+# python use_own_knowledge_dataset.py  \
+#     --csv_path /DIR/SQUAD-KB/squad-kb.csv \
+#     --output_dir  /DIR/SQUAD-KB
 
 # Start a single-node Ray cluster.
 ray start --head
@@ -15,11 +15,10 @@ ray start --head
 # run ./examples/rag/finetune_rag_ray.sh --help to see all the possible options
 
 
-
-python finetune_rag.py \
-    --data_dir  /DIR/squad-training-data \
-    --output_dir /DIR/model_checkpoints \
-    --model_name_or_path facebook/rag-token-base \
+CUDA_VISIBLE_DEVICES=2 python finetune_rag.py \
+    --data_dir  /data/squad-training-data \
+    --output_dir /output/squad/model_checkpoints \
+    --model_name_or_path output/vanilla_rag \
     --model_type rag_token \
     --fp16 \
     --gpus 2  \
@@ -47,8 +46,8 @@ python finetune_rag.py \
     --gradient_accumulation_steps 8 \
     --distributed_retriever ray \
     --num_retrieval_workers 4  \
-    --passages_path /DIR/SQUAD-KB/my_knowledge_dataset \
-    --index_path  /DIR/SQUAD-KB/my_knowledge_dataset_hnsw_index.faiss \
+    --passages_path data/my_knowledge_dataset \
+    --index_path  data/my_knowledge_dataset_hnsw_index.faiss \
     --index_name custom \
     --context_encoder_name facebook/dpr-ctx_encoder-multiset-base \
     --csv_path /DIR/SQUAD-KB/squad-kb.csv \
